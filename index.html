@@ -74,6 +74,14 @@
       color: var(--ink);
       -webkit-tap-highlight-color: transparent;
     }
+    .stage-left-tools {
+      position: absolute; top: 10px; left: 10px; z-index: 5;
+      display: flex; align-items: flex-start; gap: 6px;
+    }
+    .stage-left-tools .stage-levels-btn {
+      position: relative; top: auto; left: auto;
+    }
+    .stage-catalog { position: relative; }
     .stage-levels-btn {
       left: 10px;
       border-radius: 999px;
@@ -83,6 +91,39 @@
     }
     .stage-levels-btn[hidden] { display: none; }
     .stage-levels-btn[aria-expanded="true"] { background: #fff; color: var(--accent); }
+    .play-catalogs {
+      position: absolute; top: calc(100% + 6px); left: 0;
+      min-width: 128px;
+      display: flex; flex-direction: column; gap: 4px;
+      padding: 6px;
+      background: rgba(255,252,248,0.96);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(40, 28, 16, 0.18);
+      z-index: 6;
+    }
+    .play-catalogs[hidden] { display: none; }
+    .play-catalogs button {
+      border: none; background: #ece7e0; color: var(--ink);
+      border-radius: 999px; padding: 7px 10px;
+      font: inherit; font-size: 0.64rem; font-weight: 800;
+      cursor: pointer; white-space: nowrap; text-align: left;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .play-catalogs button.is-active { background: #f67c5f; color: #fff; }
+    .catalog-pick-panel {
+      flex: 0 0 auto;
+      margin-top: 14px;
+      margin-bottom: 10px;
+      padding: 10px 12px;
+    }
+    .catalog-switch { width: 100%; }
+    .saved-level .name-row {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .saved-level .level-index {
+      flex: 0 0 auto; min-width: 1.35em;
+      font-size: 0.78rem; font-weight: 800; color: #666;
+    }
     .studio.data-hidden .data-colors-block { display: none; }
     .panel-head {
       display: flex; align-items: center; justify-content: space-between;
@@ -202,13 +243,23 @@
     }
     .dock button:disabled { opacity: 0.4; cursor: default; }
     .play-block-toggle { margin: 8px 0 0; }
+    .colors-row {
+      display: grid;
+      grid-template-columns: minmax(88px, 0.7fr) minmax(0, 1.8fr);
+      gap: 10px;
+      align-items: start;
+    }
+    .colors-row > .field { margin-top: 0; }
+    .color-counts-field { min-width: 0; }
     .color-counts {
-      display: flex; flex-wrap: wrap; gap: 8px 10px;
-      margin-top: 10px; padding: 10px 10px 8px;
+      display: flex; flex-wrap: wrap; gap: 6px 8px;
+      padding: 8px;
       background: #f4f0ea; border-radius: 12px;
+      align-content: flex-start;
+      min-height: 38px;
     }
     .color-count {
-      display: flex; align-items: center; gap: 6px;
+      display: flex; align-items: center; gap: 5px;
     }
     .color-count i {
       width: 16px; height: 16px; border-radius: 4px;
@@ -394,6 +445,7 @@
       .design-col { grid-area: design; position: sticky; top: 16px; max-height: calc(100dvh - 32px); overflow: hidden; display: flex; flex-direction: column; }
       .data-col .panel, .design-col .panel { margin-top: 0; }
       .design-col .panel + .panel { margin-top: 0; }
+      .design-col .catalog-pick-panel { margin-top: 0; }
       .design-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
       .design-col .design-io { flex: 0 0 auto; margin-top: 14px; }
       .stage { height: min(82dvh, 760px); }
@@ -427,7 +479,16 @@
         </div>
         <div class="stage">
           <canvas id="game"></canvas>
-          <button type="button" class="stage-levels-btn" id="levelsBtn" aria-expanded="false" aria-controls="playLevels">Levels</button>
+          <div class="stage-left-tools">
+            <div class="stage-catalog">
+              <button type="button" class="stage-levels-btn" id="catalogBtn" aria-expanded="false" aria-controls="playCatalogs">Catalog</button>
+              <div class="play-catalogs" id="playCatalogs" hidden>
+                <button type="button" data-catalog="4">Capacity 4</button>
+                <button type="button" data-catalog="3">Capacity 3</button>
+              </div>
+            </div>
+            <button type="button" class="stage-levels-btn" id="levelsBtn" aria-expanded="false" aria-controls="playLevels">Levels</button>
+          </div>
           <button class="restart-btn" id="restart" title="Restart level" aria-label="Restart level">↻</button>
           <div class="play-levels" id="playLevels" hidden></div>
           <div class="hud">
@@ -475,10 +536,16 @@
     </div>
 
     <div class="design-col">
+      <div class="panel catalog-pick-panel">
+        <div class="game-switch catalog-switch" id="catalogSeg" role="tablist" aria-label="Catalog">
+          <button type="button" data-catalog="4" class="active" role="tab">Capacity 4</button>
+          <button type="button" data-catalog="3" role="tab">Capacity 3</button>
+        </div>
+      </div>
       <div class="design-scroll">
       <div class="panel">
         <h2>Level catalog</h2>
-        <p class="field-hint">Save this board writes the current deal to the open catalog level. Generate makes a Draft; Save then adds it as a new level. Rename in the list. Drag ≡ to reorder. New levels: Import JSON or Save this board, then commit levels.json.</p>
+        <p class="field-hint">Save this board writes the current deal to the open catalog. Generate makes a Draft; Save then adds it as a new level in the selected Capacity 4 / Capacity 3 catalog. Rename in the list. Drag ≡ to reorder (that catalog’s funnel index only). New levels: Import JSON or Save this board, then commit levels.json.</p>
         <div class="field" style="display:none;margin-bottom:8px">
           <label for="levelNameIn">Level name</label>
           <input id="levelNameIn" type="text" maxlength="80" placeholder="e.g. Car Sort 1" />
@@ -515,20 +582,19 @@
           <p class="field-hint" id="orderDiffBaseNote" style="display:none"></p>
         </div>
         <div class="diff-box" id="designDiffBox" style="margin:0 0 12px"></div>
-        <p class="field-hint" id="diffPresetNote" style="margin-bottom:8px">Car difficulty only changes how cars are mixed in the queues. Truck difficulty only changes how truck colors line up with those tops. Unique colors, multiplier, capacity, and hidden stay as you set them.</p>
+        <p class="field-hint" id="diffPresetNote" style="margin-bottom:8px">Car difficulty only changes how cars are mixed in the queues. Truck difficulty only changes how truck colors line up with those tops. Unique colors, per-color packs, capacity, and hidden stay as you set them.</p>
         <p class="field-hint" id="diffHuntHint" style="margin-bottom:12px">Generate only keeps a seed the winnable-path checker accepts. Chip edits are not checked until you press Check winnable.</p>
-        <div class="row-2">
+        <div class="colors-row">
           <div class="field">
             <label for="pColors">Unique Colors</label>
             <input id="pColors" type="number" min="2" max="8" value="5" />
           </div>
-          <div class="field">
-            <label for="pCandles">Color Multiplier</label>
-            <input id="pCandles" type="number" min="1" max="4" value="3" />
+          <div class="field color-counts-field">
+            <label>Color packs</label>
+            <div class="color-counts" id="colorCounts" aria-label="Per-color pack counts"></div>
           </div>
         </div>
-        <div class="color-counts" id="colorCounts" aria-label="Per-color pack counts"></div>
-        <p class="field-hint" style="margin-top:6px">Multiplier is the default and max for every color. Lower a color to give it fewer packs.</p>
+        <p class="field-hint" style="margin-top:6px">Each color has its own pack count. Default is 3; 5 and higher (up to 8) are allowed.</p>
         <div class="row-2" style="margin-top:12px">
           <div class="field">
             <label for="pTargets">Truck Amount</label>
@@ -604,7 +670,7 @@
         <textarea class="io-json" id="levelJsonIo" spellcheck="false" placeholder="Level JSON — Export fills this. Paste here to Import."></textarea>
         <div class="btn-row-2">
           <button class="btn-secondary" id="copyLevelBtn" type="button">Copy JSON</button>
-          <button class="btn-secondary" id="importLevelBtn" type="button">Import level</button>
+          <button class="btn-secondary" id="importLevelBtn" type="button" data-import-rev="nbsp-2">Import level</button>
         </div>
         <p class="field-hint" id="levelIoHint"></p>
       </div>
@@ -643,10 +709,10 @@
       return MODE_LABEL[playMode(spec)] || "Base";
     }
     const DIFF_BOARD = {
-      easy: "Car Easy: long clumps with a little mixing. Unique colors, multiplier, capacity, and hidden stay as you set them.",
-      medium: "Car Med: shorter runs, some mixing. Unique colors, multiplier, capacity, and hidden stay as you set them.",
-      hard: "Car Hard: colors interleaved across queues. Unique colors, multiplier, capacity, and hidden stay as you set them.",
-      brutal: "Car Brutal: queues fully shuffled. Unique colors, multiplier, capacity, and hidden stay as you set them."
+      easy: "Car Easy: long clumps with a little mixing. Unique colors, per-color packs, capacity, and hidden stay as you set them.",
+      medium: "Car Med: shorter runs, some mixing. Unique colors, per-color packs, capacity, and hidden stay as you set them.",
+      hard: "Car Hard: colors interleaved across queues. Unique colors, per-color packs, capacity, and hidden stay as you set them.",
+      brutal: "Car Brutal: queues fully shuffled. Unique colors, per-color packs, capacity, and hidden stay as you set them."
     };
     const DIFF_ORDER = {
       easy: " Truck Easy: opening trucks match the colors already on top.",
@@ -662,7 +728,7 @@
     };
     function presetExplain(boardBand, orderBand, mode) {
       const board = !boardBand || boardBand === "any"
-        ? "Car Any: unique colors / multiplier / hidden stay put; mix is moderate."
+        ? "Car Any: unique colors / per-color packs / hidden stay put; mix is moderate."
         : (DIFF_BOARD[boardBand] || DIFF_BOARD.medium);
       if (mode === "free") return board + " Order: Base — any finished color leaves.";
       if (mode === "jam") return board + " Jam: 3 blank tops, no park. Leave through the top; side edges are walls.";
@@ -688,7 +754,7 @@
     function shipUrls() {
       return isFilePage() ? SHIP_URLS : ["levels.json"];
     }
-    const BUILTIN_LEVELS = [{"id":"c1788812252323","name":"Water Easy 5","spec":{"colors":5,"candles":3,"sources":4,"dests":4,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order","prefill":true,"prefill1":50,"prefill2":35,"prefill3":15,"boardBand":"any","orderBand":"any","seed":1001,"edited":true,"editedFromSeed":1001},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3},"orderQueue":[0,1,2,3,4,3,1,0,0,4,2,1,2,3,4],"edited":true,"editedFromSeed":1001}},{"id":"c1788896488215","name":"Water Easy 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1028,"edited":false,"editedFromSeed":1028},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[0,3,2,1,4,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false}},{"id":"c1788953782749","name":"Water Mid 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"hard","orderBand":"easy","seed":1005,"edited":false,"editedFromSeed":1005},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false}},{"id":"c1788959255343","name":"Water Mid 7 (K\u00f6t\u00fc)","spec":{"colors":7,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"wallCover":0,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1018,"edited":true,"editedFromSeed":1018},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":6,"hidden":false},{"color":2,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3,"6":3},"orderQueue":[0,1,2,3,6,5,6,0,1,2,3,4,5,4,0,1,2,3,4,5,6],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"grid":[],"edited":true,"editedFromSeed":1018}},{"id":"c1788908296338","name":"Water Hard 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":82227,"edited":false,"editedFromSeed":82227},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[3,4,2,0,1,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false}},{"id":"c1788895855388","name":"Water Impossible? 7","spec":{"colors":7,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1016,"edited":true,"editedFromSeed":1016},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":5,"hidden":false},{"color":6,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3,"6":3},"orderQueue":[3,5,2,0,4,1,6,0,1,2,3,4,4,6,0,1,2,3,5,5,6],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":true,"editedFromSeed":1016}}];
+    const BUILTIN_LEVELS = [{"id":"c1788812252323","name":"Water Easy 5","spec":{"colors":5,"candles":3,"sources":4,"dests":4,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order","prefill":true,"prefill1":50,"prefill2":35,"prefill3":15,"boardBand":"any","orderBand":"any","seed":1001,"edited":true,"editedFromSeed":1001},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3},"orderQueue":[0,1,2,3,4,3,1,0,0,4,2,1,2,3,4],"edited":true,"editedFromSeed":1001}},{"id":"c1788896488215","name":"Water Easy 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1028,"edited":false,"editedFromSeed":1028},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[0,3,2,1,4,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false}},{"id":"c1788953782749","name":"Water Mid 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"hard","orderBand":"easy","seed":1005,"edited":false,"editedFromSeed":1005},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false}},{"id":"c1788959255343","name":"Water Mid 7 (K\u00f6t\u00fc)","spec":{"colors":7,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"wallCover":0,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1018,"edited":true,"editedFromSeed":1018},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":6,"hidden":false},{"color":2,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3,"6":3},"orderQueue":[0,1,2,3,6,5,6,0,1,2,3,4,5,4,0,1,2,3,4,5,6],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"grid":[],"edited":true,"editedFromSeed":1018}},{"id":"c1788908296338","name":"Water Hard 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":82227,"edited":false,"editedFromSeed":82227},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[3,4,2,0,1,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false}},{"id":"c1788895855388","name":"Impossible 7","spec":{"colors":7,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":2412},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":6,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3,"6":3},"orderQueue":[0,2,1,3,4,5,6,0,1,2,3,4,5,6,0,6,2,3,4,5,1],"givenQueue":[],"givenPlan":[],"givenPlanned":false},"index":8}];
     let SHIPPED_LEVELS = BUILTIN_LEVELS;
     const PALETTE = [
       { body: "#E32636", top: "#FF4D5C", side: "#B81C2A", deep: "#8C121C", name: "red" },
@@ -708,6 +774,7 @@
 
     let dpr = 1, W = 1, H = 1, lastTs = 0, audioCtx = null;
     let activeLevelId = null;
+    let activeCatalog = 4;
 
     const state = {
       level: 1, seed: 1, status: "play",
@@ -829,45 +896,57 @@
       if (lab) lab.textContent = state.carSkin ? "On" : "Off";
       syncLayout();
     }
-    function colorMax(spec) {
-      return Math.max(1, Math.min(4, +((spec || state.spec || {}).candles) || 3));
+    const COLOR_PACK_MIN = 1;
+    const COLOR_PACK_MAX = 8;
+    const COLOR_PACK_DEFAULT = 3;
+    function clampColorPack(v) {
+      const n = +v;
+      if (!n) return COLOR_PACK_DEFAULT;
+      return Math.max(COLOR_PACK_MIN, Math.min(COLOR_PACK_MAX, n));
+    }
+    function colorCountList(spec) {
+      const s = spec || state.spec || {};
+      const n = Math.max(2, Math.min(8, +s.colors || 5));
+      const prev = s.colorCounts || [];
+      // Missing individuals default to 3. Older levels with only candles
+      // keep that pack count until the user edits a color.
+      const fill = prev.length ? COLOR_PACK_DEFAULT : clampColorPack(s.candles || COLOR_PACK_DEFAULT);
+      return Array.from({ length: n }, (_, i) => {
+        if (prev[i] != null && +prev[i]) return clampColorPack(prev[i]);
+        return fill;
+      });
+    }
+    function derivedCandles(spec) {
+      const counts = colorCountList(spec);
+      return counts.reduce((m, v) => Math.max(m, v), COLOR_PACK_DEFAULT);
     }
     function colorPacks(spec, c) {
-      const s = spec || state.spec || {};
-      const max = colorMax(s);
-      const arr = s.colorCounts;
-      const v = arr && arr[c] != null ? +arr[c] : max;
-      return Math.max(1, Math.min(max, v || max));
+      const counts = colorCountList(spec);
+      return counts[c] != null ? counts[c] : COLOR_PACK_DEFAULT;
     }
     function syncColorCounts(spec) {
       const s = spec || state.spec || {};
-      const n = Math.max(2, Math.min(8, +s.colors || 5));
-      const max = colorMax(s);
-      const prev = s.colorCounts || [];
-      s.colorCounts = Array.from({ length: n }, (_, i) => {
-        const v = prev[i] != null ? +prev[i] : max;
-        return Math.max(1, Math.min(max, v || max));
-      });
+      s.colorCounts = colorCountList(s);
+      s.candles = derivedCandles(s);
       return s.colorCounts;
     }
-    function readColorCountsFromUi(max) {
+    function readColorCountsFromUi() {
       const root = document.getElementById("colorCounts");
       if (!root) return [];
       return Array.from(root.querySelectorAll("input[data-color]")).map((inp) => {
-        return Math.max(1, Math.min(max, +inp.value || max));
+        return clampColorPack(inp.value);
       });
     }
     function renderColorCounts(spec) {
       const root = document.getElementById("colorCounts");
       if (!root) return;
-      const s = spec || (state.spec ? { ...state.spec, ...readParamsLite() } : null) || { colors: 5, candles: 3 };
+      const s = spec || (state.spec ? { ...state.spec, ...readParamsLite() } : null) || { colors: 5 };
       const n = Math.max(2, Math.min(8, +s.colors || 5));
-      const max = colorMax(s);
-      const counts = syncColorCounts({ ...s, colors: n, candles: max, colorCounts: s.colorCounts });
+      const counts = colorCountList({ ...s, colors: n, colorCounts: s.colorCounts });
       root.innerHTML = counts.map((v, i) => {
         const pal = PALETTE[i] || { body: "#888" };
         return '<label class="color-count"><i style="background:' + pal.body + '"></i>' +
-          '<input type="number" min="1" max="' + max + '" value="' + v + '" data-color="' + i + '" /></label>';
+          '<input type="number" min="' + COLOR_PACK_MIN + '" max="' + COLOR_PACK_MAX + '" value="' + v + '" data-color="' + i + '" /></label>';
       }).join("");
       root.querySelectorAll("input[data-color]").forEach((inp) => {
         inp.oninput = () => persistColorCountsFromUi();
@@ -875,8 +954,7 @@
     }
     function persistColorCountsFromUi() {
       if (!state.spec) return;
-      const max = colorMax(state.spec);
-      const fromUi = readColorCountsFromUi(max);
+      const fromUi = readColorCountsFromUi();
       if (fromUi.length) state.spec.colorCounts = fromUi;
       syncColorCounts(state.spec);
     }
@@ -884,15 +962,19 @@
       persistColorCountsFromUi();
       if (!state.spec) return;
       state.spec.colors = Math.max(2, Math.min(8, +document.getElementById("pColors").value || 5));
-      state.spec.candles = Math.max(1, Math.min(4, +document.getElementById("pCandles").value || 3));
       syncColorCounts(state.spec);
       renderColorCounts(state.spec);
     }
     function readParamsLite() {
+      const colors = Math.max(2, Math.min(8, +document.getElementById("pColors").value || 5));
+      const ui = readColorCountsFromUi();
+      const colorCounts = ui.length
+        ? ui
+        : colorCountList({ colors: colors, colorCounts: state.spec && state.spec.colorCounts });
       return {
-        colors: Math.max(2, Math.min(8, +document.getElementById("pColors").value || 5)),
-        candles: Math.max(1, Math.min(4, +document.getElementById("pCandles").value || 3)),
-        colorCounts: state.spec && state.spec.colorCounts
+        colors: colors,
+        colorCounts: colorCounts,
+        candles: derivedCandles({ colors: colors, colorCounts: colorCounts })
       };
     }
     function topRun(stack) {
@@ -1226,13 +1308,118 @@
       for (let k = 0; k < next.n; k++) dest.pieces.push(piece(next.color, false));
       if (destComplete(target)) startCollect(target);
     }
+    function flyPieceColor(a) {
+      const p = a && a.pieces && a.pieces[0];
+      return p && p.color != null ? p.color : null;
+    }
     function incomingDest(i) {
-      if (state.anim && state.anim.to && state.anim.to.kind === "dest" && state.anim.to.i === i) return state.anim.n || 1;
+      if (state.anim && state.anim.to && state.anim.to.kind === "dest" && state.anim.to.i === i) {
+        return state.anim.n || (state.anim.pieces && state.anim.pieces.length) || 1;
+      }
       return 0;
     }
     function incomingTarget(i) {
-      if (state.anim && state.anim.to && state.anim.to.kind === "target" && state.anim.to.i === i) return state.anim.n || 1;
+      if (state.anim && state.anim.to && state.anim.to.kind === "target" && state.anim.to.i === i) {
+        return state.anim.n || (state.anim.pieces && state.anim.pieces.length) || 1;
+      }
       return 0;
+    }
+    function incomingDestColor(i) {
+      return incomingDest(i) ? flyPieceColor(state.anim) : null;
+    }
+    function incomingTargetColor(i) {
+      return incomingTarget(i) ? flyPieceColor(state.anim) : null;
+    }
+    function destHoldColor(i) {
+      const d = state.dests[i];
+      if (d && d.pieces.length) return d.pieces[0].color;
+      return incomingDestColor(i);
+    }
+    function destTopRun(d) {
+      if (!d || !d.pieces.length) return 0;
+      const color = d.pieces[d.pieces.length - 1].color;
+      let n = 0;
+      for (let k = d.pieces.length - 1; k >= 0 && d.pieces[k].color === color; k--) n++;
+      return n;
+    }
+    function destCommitCount(i) {
+      const d = state.dests[i];
+      if (!d || !d.pieces.length) return 0;
+      if (!carMode() && destComplete(i)) return d.pieces.length;
+      return destTopRun(d);
+    }
+    function destWillFlyUp(i) {
+      const d = state.dests[i];
+      if (!d || !d.pieces.length) return false;
+      const top = d.pieces[d.pieces.length - 1];
+      if (!top || top.hidden) return false;
+      if (carMode() || order2Mode()) return isOpenTarget(top.color);
+      return destComplete(i) && isOpenTarget(top.color);
+    }
+    function pendingDockForTarget(targetI, exceptDest) {
+      if (!carMode() && !order2Mode()) return 0;
+      const color = visibleTargets()[targetI];
+      if (color == null) return 0;
+      let n = 0;
+      for (let i = 0; i < state.dests.length; i++) {
+        if (i === exceptDest) continue;
+        if (!destWillFlyUp(i)) continue;
+        const d = state.dests[i];
+        if (d.pieces[d.pieces.length - 1].color !== color) continue;
+        let claim = destCommitCount(i);
+        if (state.anim && state.anim.from && state.anim.from.kind === "dest" && state.anim.from.i === i && !state.anim.reserved) {
+          claim -= state.anim.n || 1;
+        }
+        if (claim <= 0) continue;
+        if (findTargetFor(color, false, { pending: false }) !== targetI) continue;
+        n += claim;
+      }
+      return n;
+    }
+    function targetOccupancy(i, opts) {
+      const bin = state.targetBins[i] || { pieces: [] };
+      const skipPending = opts && opts.pending === false;
+      const exceptDest = opts && opts.exceptDest;
+      return bin.pieces.length + incomingTarget(i) + (skipPending ? 0 : pendingDockForTarget(i, exceptDest));
+    }
+    function spaceOn(sel, opts) {
+      if (!sel) return 0;
+      if (sel.kind === "target") return targetFill() - targetOccupancy(sel.i, opts);
+      if (sel.kind === "dest") {
+        const d = state.dests[sel.i];
+        if (!d) return 0;
+        return destCap() - d.pieces.length - incomingDest(sel.i);
+      }
+      return 0;
+    }
+    function animFlyColor() {
+      if (!state.anim || !state.anim.pieces || !state.anim.pieces.length) return null;
+      return state.anim.pieces[0].color;
+    }
+    // A same-color stack already in the air, or a lot about to auto-dock, owns that slot.
+    function committedUpwardFor(color) {
+      if (color == null) return null;
+      if (state.anim && state.anim.to && animFlyColor() === color) return state.anim.to;
+      if (!carMode() && !order2Mode()) return null;
+      if (!isOpenTarget(color)) return null;
+      let claim = 0;
+      for (let i = 0; i < state.dests.length; i++) {
+        if (!destWillFlyUp(i)) continue;
+        if (state.dests[i].pieces[state.dests[i].pieces.length - 1].color !== color) continue;
+        let n = destCommitCount(i);
+        if (state.anim && state.anim.from && state.anim.from.kind === "dest" && state.anim.from.i === i && !state.anim.reserved) {
+          n -= state.anim.n || 1;
+        }
+        if (n > 0) claim += n;
+      }
+      if (claim <= 0) return null;
+      const t = findTargetFor(color, false, { pending: false });
+      if (t < 0) return null;
+      return { kind: "target", i: t };
+    }
+    function wouldStealUpwardSlot(color) {
+      const committed = committedUpwardFor(color);
+      return !!(committed && spaceOn(committed) <= 0);
     }
     function orderMode(spec) {
       return playMode(spec) === "order";
@@ -1478,28 +1665,26 @@
       if (!queueMode()) return true;
       return visibleTargets().indexOf(color) >= 0;
     }
-    function findTargetSlot(color) {
+    function findTargetSlot(color, slotI) {
       const q = state.orderQueue || [];
       const n = targetCount();
+      if (slotI != null && slotI >= 0 && slotI < Math.min(n, q.length) && q[slotI] === color) return slotI;
       for (let i = 0; i < Math.min(n, q.length); i++) {
         if (q[i] === color) return i;
       }
-      return 0;
+      return slotI != null && slotI >= 0 ? slotI : 0;
     }
-    function consumeTarget(color) {
+    function consumeTarget(color, slotI) {
       if (!queueMode()) return;
       const q = state.orderQueue;
       const n = targetCount();
-      for (let i = 0; i < Math.min(n, q.length); i++) {
-        if (q[i] === color) {
-          if (q.length > n) {
-            q[i] = q[n];
-            q.splice(n, 1);
-          } else {
-            q[i] = null;
-          }
-          return;
-        }
+      const i = findTargetSlot(color, slotI);
+      if (i < 0 || i >= Math.min(n, q.length) || q[i] !== color) return;
+      if (q.length > n) {
+        q[i] = q[n];
+        q.splice(n, 1);
+      } else {
+        q[i] = null;
       }
     }
     function consumeAndAnimateTarget(color, destI) {
@@ -1689,7 +1874,8 @@
       if (carMode()) return used < 1;
       if (destComplete(i) && !isOpenTarget(d.pieces[0].color, i)) return false;
       if (used >= destCap()) return false;
-      if (d.pieces.length && d.pieces[0].color !== color) return false;
+      const hold = destHoldColor(i);
+      if (hold != null && hold !== color) return false;
       return true;
     }
     function findDestFor(color) {
@@ -1702,10 +1888,9 @@
       let best = -1;
       let bestUsed = -1;
       for (let i = 0; i < state.dests.length; i++) {
-        const d = state.dests[i];
-        if (!d.pieces.length || d.pieces[0].color !== color) continue;
+        if (destHoldColor(i) !== color) continue;
         if (!destAccepts(i, color)) continue;
-        const used = d.pieces.length + incomingDest(i);
+        const used = state.dests[i].pieces.length + incomingDest(i);
         if (!givenMode()) return i;
         if (used > bestUsed) {
           best = i;
@@ -1714,11 +1899,12 @@
       }
       if (best >= 0) return best;
       for (let i = 0; i < state.dests.length; i++) {
+        if (destHoldColor(i) != null) continue;
         if (!state.dests[i].pieces.length && destAccepts(i, color)) return i;
       }
       return -1;
     }
-    function findTargetFor(color, onlySelected) {
+    function findTargetFor(color, onlySelected, opts) {
       const vis = visibleTargets();
       const fill = targetFill();
       const start = onlySelected && state.selectedTarget != null ? state.selectedTarget : 0;
@@ -1726,9 +1912,14 @@
       let best = -1;
       let bestUsed = -1;
       for (let i = start; i < end; i++) {
-        if (vis[i] !== color) continue;
         const bin = state.targetBins[i] || { pieces: [] };
-        const used = bin.pieces.length + incomingTarget(i);
+        if (bin.pieces.some((p) => p.color !== color)) continue;
+        const incomingC = incomingTargetColor(i);
+        if (incomingC != null && incomingC !== color) continue;
+        const posted = vis[i] === color;
+        const leftover = bin.pieces.length > 0 && bin.pieces[0].color === color;
+        if (!posted && !leftover) continue;
+        const used = targetOccupancy(i, opts);
         if (used >= fill) continue;
         if (used > bestUsed) {
           best = i;
@@ -1800,8 +1991,8 @@
     function targetBinFull(i) {
       const bin = state.targetBins[i];
       if (!bin || !bin.pieces.length) return false;
-      const color = visibleTargets()[i];
-      return color != null && bin.pieces.length >= targetFill() && bin.pieces.every((p) => p.color === color);
+      const fillColor = bin.pieces[0].color;
+      return bin.pieces.length >= targetFill() && bin.pieces.every((p) => p.color === fillColor);
     }
 
     function remainingGoal() {
@@ -1873,9 +2064,11 @@
     }
 
     function readParams() {
+      const lite = readParamsLite();
       return {
-        colors: Math.max(2, Math.min(8, +document.getElementById("pColors").value || 5)),
-        candles: Math.max(1, Math.min(4, +document.getElementById("pCandles").value || 3)),
+        colors: lite.colors,
+        candles: lite.candles,
+        colorCounts: lite.colorCounts,
         sources: Math.max(2, Math.min(7, +document.getElementById("pSources").value || 4)),
         dests: Math.max(1, Math.min(6, +document.getElementById("pDests").value || 3)),
         targets: Math.max(1, Math.min(6, +document.getElementById("pTargets").value || 2)),
@@ -1893,13 +2086,7 @@
         prefill3: document.getElementById("pPrefill3") ? Math.max(0, Math.min(100, +document.getElementById("pPrefill3").value || 0)) : 16,
         boardBand: readBand("boardDiffSeg"),
         orderBand: readBand("orderDiffSeg"),
-        seed: +document.getElementById("pSeed").value || 1001,
-        colorCounts: (function () {
-          const max = Math.max(1, Math.min(4, +document.getElementById("pCandles").value || 3));
-          const ui = readColorCountsFromUi(max);
-          if (ui.length) return ui;
-          return (state.spec && state.spec.colorCounts) || [];
-        })()
+        seed: +document.getElementById("pSeed").value || 1001
       };
     }
 
@@ -1911,7 +2098,6 @@
 
     function writeParams(spec) {
       document.getElementById("pColors").value = spec.colors;
-      document.getElementById("pCandles").value = spec.candles;
       syncColorCounts(spec);
       renderColorCounts(spec);
       document.getElementById("pSources").value = spec.sources;
@@ -2550,7 +2736,7 @@
         if (chip.rack) {
           const bin = state.targetBins[i];
           const got = bin ? bin.pieces.length : 0;
-          const hide = (state.anim && state.anim.from && state.anim.from.kind === "target" && state.anim.from.i === i) ? state.anim.n : 0;
+          const hide = flyHide("target", i);
           const show = Math.max(0, got - hide);
           const sel = order2Mode() && state.selectedTarget === i;
           if (oldC == null && newC == null) {
@@ -2633,7 +2819,7 @@
         layers.push({ y: L.y, z: L.y, draw: () => {
           const waiting = destComplete(i) && !isOpenTarget(state.dests[i].pieces[0].color);
           const ready = destComplete(i) && isOpenTarget(state.dests[i].pieces[0].color);
-          const hide = (state.anim && state.anim.from && state.anim.from.kind === "dest" && state.anim.from.i === i) ? state.anim.n : 0;
+          const hide = flyHide("dest", i);
           if (L.cols) drawDestLot(L, state.dests[i], hide, waiting, ready);
           else {
             drawAlcove(L, waiting, L.side, !state.dests[i].pieces.length);
@@ -2697,7 +2883,7 @@
       state.layout.sources.forEach((L, i) => {
         const ox = sourceShakeX(i);
         drawBase(L, ox);
-        const hideTop = (state.anim && state.anim.from.kind === "src" && state.anim.from.i === i) ? state.anim.n : 0;
+        const hideTop = flyHide("src", i);
         const remaining = state.sources[i].pieces.length - hideTop;
         const target = shownCount(remaining);
         const shown = columnShown(i, remaining);
@@ -3119,7 +3305,7 @@
       const mode = playMode(spec);
       const cap = packSize(spec);
       const nColors = Object.keys(goal).length || spec.colors || 0;
-      const candles = spec.candles || 1;
+      const packs = colorCountList(spec);
       const nSrc = Math.max(1, sources.length || spec.sources || 1);
       const pieces = sources.reduce((n, s) => n + ((s.pieces || []).length), 0);
       const avgH = pieces / nSrc;
@@ -3134,7 +3320,7 @@
       const board = mix < 0.38 ? 1.6 : mix < 0.55 ? 4.0 : mix < 0.74 ? 6.0 : 8.5;
       const notes = [];
       notes.push("Mix " + mix.toFixed(2) + (mix > 0.7 ? " (high interleave)" : mix < 0.35 ? " (chunky runs)" : " (medium mix)"));
-      notes.push("Capacity " + cap + " · multiplier " + candles + " · " + nColors + " colors · avg queue " + avgH.toFixed(1));
+      notes.push("Capacity " + cap + " · packs " + packs.join(",") + " · " + nColors + " colors · avg queue " + avgH.toFixed(1));
       let order = 0;
       if (mode === "cardyn") {
         notes.push("Car Dynamic Puzzle: blank tops are claimed from the columns");
@@ -3218,9 +3404,11 @@
 
     function dumpBoard() {
       const spec = state.spec || {};
+      const flying = (state.anim && state.anim.pieces) ? state.anim.pieces.length : 0;
       const pieces = state.sources.reduce((n, st) => n + st.pieces.length, 0)
         + state.dests.reduce((n, st) => n + st.pieces.length, 0)
-        + (state.targetBins || []).reduce((n, st) => n + st.pieces.length, 0);
+        + (state.targetBins || []).reduce((n, st) => n + st.pieces.length, 0)
+        + flying;
       const hidden = state.sources.reduce((n, st) => n + st.pieces.filter((p) => p.hidden).length, 0);
       const dealPieces = state.deal
         ? state.deal.sources.reduce((n, st) => n + st.pieces.length, 0)
@@ -3255,12 +3443,12 @@
         (givenMode()
           ? "<div>Givens <span>" + ((state.givenPlan || []).length) + "</span></div>"
           : "") +
-        "<div>Color multiplier <span>" + (spec.candles || 3) + "</span></div>";
+        "<div>Color packs <span>" + (colorCountList(spec).join(" · ") || COLOR_PACK_DEFAULT) + "</span></div>";
       document.getElementById("dataColors").innerHTML = Object.keys(state.goal).map((c) => {
         if (!PALETTE[c]) return "";
         const need = state.goal[c] * packSize();
         const got = (state.delivered[c] || 0) * packSize();
-        const onBoard = state.sources.concat(state.dests, state.targetBins || []).reduce((n, st) => n + st.pieces.filter((p) => p.color === +c).length, 0) + countGridColor(+c);
+        const onBoard = state.sources.concat(state.dests, state.targetBins || []).reduce((n, st) => n + st.pieces.filter((p) => p.color === +c).length, 0) + countGridColor(+c) + ((state.anim && state.anim.pieces) || []).filter((p) => p.color === +c).length;
         return '<div class="swatch"><i class="dot" style="background:' + PALETTE[c].body + '"></i>' + PALETTE[c].name + " " + (got + onBoard) + "/" + need + "</div>";
       }).join("");
       const destRows = state.dests.map((st, i) => stackRow(destLabel(i), st, "dest", i)).join("");
@@ -3363,6 +3551,7 @@
       // levels.json from git/studio is the catalog. Do not merge builtins back in
       // (that would hide newly shipped ids) or honor a stale local deleted set.
       const copy = cloneLevels(incoming);
+      applyCatalogIndexes(copy);
       SHIPPED_LEVELS = copy;
       localStorage.setItem(SAVE_KEY, JSON.stringify(copy));
       persistMeta({
@@ -3409,6 +3598,7 @@
       });
     }
     function writeSaved(list) {
+      applyCatalogIndexes(list);
       const copy = cloneLevels(list);
       const currentIds = new Set(copy.map((x) => x.id));
       const shipped = shippedList();
@@ -3452,8 +3642,77 @@
     function catalogViewMode() {
       return "order2";
     }
+    function catalogCap(value) {
+      return +value === 3 ? 3 : 4;
+    }
+    function catalogLabel(cap) {
+      return catalogCap(cap) === 3 ? "Capacity 3" : "Capacity 4";
+    }
+    // Map a level to Capacity 3 or Capacity 4. Odd slotFill values join the closest catalog.
+    function itemCatalog(item) {
+      const fill = +((item && item.spec && item.spec.slotFill) || 0);
+      if (fill === 3) return 3;
+      if (fill === 4) return 4;
+      if (fill > 0 && fill < 3.5) return 3;
+      return 4;
+    }
+    function applyCatalogIndexes(list, onlyCap) {
+      const counts = { 3: 0, 4: 0 };
+      (list || []).forEach((item) => {
+        if (!item) return;
+        const cap = itemCatalog(item);
+        if (onlyCap && cap !== onlyCap) return;
+        counts[cap] += 1;
+        item.index = counts[cap];
+      });
+      return list;
+    }
+    function levelFunnelIndex(item, i) {
+      const n = +(item && item.index);
+      return n > 0 ? n : (i + 1);
+    }
+    function levelListLabel(item, i) {
+      return levelFunnelIndex(item, i) + ". " + ((item && item.name) || "Level");
+    }
     function catalogVisible(mode) {
-      return loadSaved().filter((item) => itemHasDeal(item) && itemModeKey(item) === "order2");
+      const wantMode = mode || "order2";
+      return loadSaved().filter((item) => {
+        if (!itemHasDeal(item) || itemModeKey(item) !== wantMode) return false;
+        if (wantMode !== "order2") return true;
+        return itemCatalog(item) === activeCatalog;
+      });
+    }
+    function catalogMenuOpen() {
+      const el = document.getElementById("playCatalogs");
+      return !!(el && !el.hidden);
+    }
+    function setCatalogMenu(open) {
+      if (open) {
+        const el = document.getElementById("playLevels");
+        const btn = document.getElementById("levelsBtn");
+        if (el) el.hidden = true;
+        if (btn) btn.setAttribute("aria-expanded", "false");
+      }
+      const picker = document.getElementById("playCatalogs");
+      const catalogBtn = document.getElementById("catalogBtn");
+      if (picker) picker.hidden = !open;
+      if (catalogBtn) catalogBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      syncCatalogChrome();
+    }
+    function syncCatalogChrome() {
+      document.querySelectorAll("#catalogSeg button[data-catalog], #playCatalogs button[data-catalog]").forEach((btn) => {
+        const on = catalogCap(btn.dataset.catalog) === activeCatalog;
+        btn.classList.toggle("active", on);
+        btn.classList.toggle("is-active", on);
+      });
+    }
+    function setActiveCatalog(cap) {
+      activeCatalog = catalogCap(cap);
+      const slotEl = document.getElementById("pSlotFill");
+      if (slotEl) slotEl.value = String(activeCatalog);
+      setCatalogMenu(false);
+      syncCatalogChrome();
+      renderCatalog();
     }
     function playCatalogItem(item) {
       if (!item) return;
@@ -3589,16 +3848,18 @@
       return !!(el && el.classList && el.classList.contains("level-name-in"));
     }
     function catalogItemFromBoard(id, name) {
+      const spec = {
+        ...state.spec,
+        edited: !!(state.deal && state.deal.edited),
+        editedFromSeed: state.deal && state.deal.editedFromSeed != null
+          ? state.deal.editedFromSeed
+          : state.seed
+      };
+      spec.slotFill = activeCatalog === 3 ? 3 : 4;
       return {
         id: id,
         name: name,
-        spec: {
-          ...state.spec,
-          edited: !!(state.deal && state.deal.edited),
-          editedFromSeed: state.deal && state.deal.editedFromSeed != null
-            ? state.deal.editedFromSeed
-            : state.seed
-        },
+        spec: spec,
         deal: snapshotDeal()
       };
     }
@@ -3650,8 +3911,7 @@
         const meta = document.getElementById("dataMeta");
         if (meta) meta.textContent = saved;
         writeLevelName(saved);
-        const pill = document.querySelector("#playLevels button.is-active");
-        if (pill) pill.textContent = saved;
+        renderPlayLevels();
       }
       return true;
     }
@@ -3685,6 +3945,12 @@
       return !!(el && !el.hidden);
     }
     function setLevelsMenu(open) {
+      if (open) {
+        const picker = document.getElementById("playCatalogs");
+        const catalogBtn = document.getElementById("catalogBtn");
+        if (picker) picker.hidden = true;
+        if (catalogBtn) catalogBtn.setAttribute("aria-expanded", "false");
+      }
       const el = document.getElementById("playLevels");
       const btn = document.getElementById("levelsBtn");
       if (el) el.hidden = !open;
@@ -3702,10 +3968,10 @@
         el.hidden = true;
         return;
       }
-      list.forEach((item) => {
+      list.forEach((item, i) => {
         const b = document.createElement("button");
         b.type = "button";
-        b.textContent = item.name || "Level";
+        b.textContent = levelListLabel(item, i);
         if (item.id === activeLevelId) b.className = "is-active";
         b.onclick = () => playCatalogItem(item);
         el.appendChild(b);
@@ -3721,11 +3987,11 @@
       if (!list.length) {
         const p = document.createElement("p");
         p.className = "field-hint";
-        p.textContent = "No " + modeLabel() + " levels yet.";
+        p.textContent = "No " + catalogLabel(activeCatalog) + " levels yet.";
         el.appendChild(p);
         return;
       }
-      list.forEach((item) => {
+      list.forEach((item, i) => {
         const row = document.createElement("div");
         row.className = "saved-level" + (item.id === activeLevelId ? " is-active" : "");
         row.dataset.levelId = item.id;
@@ -3738,6 +4004,11 @@
         handle.disabled = list.length < 2;
         const meta = document.createElement("div");
         meta.className = "meta";
+        const nameRow = document.createElement("div");
+        nameRow.className = "name-row";
+        const indexEl = document.createElement("b");
+        indexEl.className = "level-index";
+        indexEl.textContent = levelFunnelIndex(item, i) + ".";
         const nameIn = document.createElement("input");
         nameIn.className = "level-name-in";
         nameIn.type = "text";
@@ -3777,7 +4048,8 @@
           ? "car " + gradeSpec.boardBand.name + " / truck " + gradeSpec.orderBand.name
           : "car " + gradeSpec.boardBand.name;
         sub.textContent = modeLabel(spec) + " · " + sources.length + " cols · " + total + " pieces · " + seedCaption(spec, item.deal) + " · " + grade;
-        meta.append(nameIn, sub);
+        nameRow.append(indexEl, nameIn);
+        meta.append(nameRow, sub);
         const play = document.createElement("button");
         play.className = "play-level";
         play.type = "button";
@@ -3849,10 +4121,14 @@
       if (queueMode() || carMode()) {
         const color = d.pieces[d.pieces.length - 1].color;
         if (!isOpenTarget(color, i)) return;
-        const t = findTargetFor(color, false);
+        const t = findTargetFor(color, false, { pending: false, exceptDest: i });
         if (t < 0) return;
+        const bin = state.targetBins[t] || { pieces: [] };
+        const space = targetFill() - bin.pieces.length - incomingTarget(t);
+        if (space <= 0) return;
         // Skin lots dump one car at a time. Classic dest stacks fly as one group.
-        const n = carSkinOn() ? 1 : d.pieces.length;
+        const n = Math.min(carSkinOn() ? 1 : d.pieces.length, space);
+        if (n <= 0) return;
         beginFly({ kind: "dest", i }, { kind: "target", i: t }, n);
         return;
       }
@@ -3892,12 +4168,12 @@
 
     function completeTarget(i) {
       if (!targetBinFull(i)) return;
-      const color = visibleTargets()[i];
-      if (color == null) return;
       const bin = state.targetBins[i];
+      const fillColor = bin.pieces[0].color;
+      const posted = visibleTargets()[i];
       bin.pieces = [];
-      consumeAndAnimateTarget(color, i);
-      state.delivered[color] = (state.delivered[color] || 0) + 1;
+      if (posted === fillColor) consumeAndAnimateTarget(fillColor, i);
+      state.delivered[fillColor] = (state.delivered[fillColor] || 0) + 1;
       renderGoal();
       if (isWon()) {
         state.status = "win";
@@ -3965,7 +4241,7 @@
         if (!d.pieces.length) continue;
         const top = d.pieces[d.pieces.length - 1];
         if (top.hidden || !isOpenTarget(top.color)) continue;
-        const t = findTargetFor(top.color, false);
+        const t = findTargetFor(top.color, false, { pending: false, exceptDest: i });
         if (t < 0) continue;
         const bin = state.targetBins[t] || { pieces: [] };
         const space = fill - bin.pieces.length - incomingTarget(t);
@@ -4004,14 +4280,52 @@
       };
     }
 
+    function takeFlyPieces(from, n) {
+      if (from.kind === "grid") {
+        const cell = state.grid[from.r] && state.grid[from.r][from.c];
+        if (!cell || cell.wall || cell.color == null) return [];
+        state.grid[from.r][from.c] = null;
+        return [{ color: cell.color, hidden: false }];
+      }
+      const src = stackOf(from);
+      if (!src || !src.pieces.length) return [];
+      const take = Math.min(n, src.pieces.length);
+      const moved = src.pieces.splice(src.pieces.length - take, take);
+      moved.forEach((p) => { p.hidden = false; });
+      if (from.kind !== "target") revealTop(src);
+      return moved;
+    }
+    function seatFly(a) {
+      if (!a || !a.pieces || !a.pieces.length) return;
+      const to = stackOf(a.to);
+      if (!to || !to.pieces) {
+        a.pieces = [];
+        return;
+      }
+      a.pieces.forEach((p) => {
+        p.hidden = false;
+        to.pieces.push(p);
+      });
+      a.pieces = [];
+    }
+    function flyHide(kind, i) {
+      const a = state.anim;
+      if (!a || !a.from || a.from.kind !== kind || a.from.i !== i) return 0;
+      if (a.reserved) return 0;
+      return a.n || 0;
+    }
+
     function beginFly(from, to, n, opts) {
+      if (state.anim) return false;
       const silent = !!(opts && opts.silent);
       const skin = carSkinOn();
       if (skin && from && from.kind === "dest" && to && to.kind === "target" && n > 1) n = 1;
-      if (!silent) snapshot();
       const src = stackOf(from);
+      const available = src && src.pieces ? src.pieces.length : 0;
+      n = Math.min(Math.max(0, n || 0), available);
+      if (n < 1) return false;
+      if (!silent) snapshot();
       const L0 = layoutOf(from);
-      const pieces = src.pieces.slice(-n).map((p) => ({ color: p.color, hidden: false }));
       let startX = L0.x;
       let startY = L0.y - 6;
       if (from.kind === "src") {
@@ -4094,8 +4408,11 @@
           { x: endX, y: endY }
         ];
       }
+      const pieces = takeFlyPieces(from, n);
+      if (!pieces.length) return false;
+      n = pieces.length;
       state.anim = {
-        from, to, n, pieces, silent, path, square, size,
+        from, to, n, pieces, silent, reserved: true, path, square, size,
         x0: startX, y0: startY, x1: endX, y1: endY,
         x: startX, y: startY, r: L0.r, ry: L0.ry || L0.r * 0.38, segH: L0.segH, step: stepH(L0),
         t: 0, dur: silent ? 0.18 : FLY_BASE + n * FLY_PER
@@ -4110,8 +4427,9 @@
 
     function finishMove() {
       const a = state.anim;
+      if (!a) return;
       state.anim = null;
-      applyMove(a.from, a.to, a.n);
+      seatFly(a);
       if (!a.silent) state.moves += 1;
       if (a.to.kind === "dest" && destComplete(a.to.i)) {
         const color = state.dests[a.to.i].pieces[0].color;
@@ -4125,13 +4443,13 @@
         const left = state.sources[i].pieces.length;
         if (blockMode() && (state.sourceShown[i] || 0) <= 0 && left > 0) {
           startPageRise(i, Math.min(visCount(), left));
-        } else {
+        } else if (!state.anim) {
           flushQueue();
         }
-      } else {
+      } else if (!state.anim) {
         flushQueue();
       }
-      flushOrderMatches();
+      if (!state.anim) flushOrderMatches();
       if (!state.anim && compactParksLeft()) dumpBoard();
     }
 
@@ -4179,6 +4497,10 @@
     }
 
     function sendFrom(i) {
+      if (state.anim) {
+        if (state.sources[i] && topRun(state.sources[i])) state.queued = i;
+        return;
+      }
       const stack = state.sources[i];
       const run = topRun(stack);
       if (!run) {
@@ -4189,6 +4511,28 @@
       const rising = state.rise && state.rise.i === i && !state.rise.done;
       if (blockMode() && rising) return;
       const onlySel = order2Mode() && state.selectedTarget != null;
+      const shown = columnShown(i, stack.pieces.length);
+      const committed = committedUpwardFor(color);
+      if (committed) {
+        const space = spaceOn(committed);
+        if (space <= 0) {
+          shakeSource(i);
+          dumpBoard();
+          return;
+        }
+        if (state.anim) {
+          state.queued = i;
+          return;
+        }
+        const n = Math.min(run, space, shown);
+        if (n > 0 && beginFly({ kind: "src", i }, committed, n)) {
+          dumpBoard();
+          return;
+        }
+        shakeSource(i);
+        dumpBoard();
+        return;
+      }
       let t = queueMode() ? findTargetFor(color, onlySel) : -1;
       if (t < 0 && carDynMode()) {
         t = findNeutralSlot();
@@ -4198,14 +4542,18 @@
         }
       }
       if (t >= 0 && (carMode() || order2Mode())) {
-        const bin = state.targetBins[t] || { pieces: [] };
-        const space = targetFill() - bin.pieces.length - incomingTarget(t);
-        const n = Math.min(run, space, columnShown(i, stack.pieces.length));
+        const space = targetFill() - targetOccupancy(t);
+        const n = Math.min(run, space, shown);
         if (n > 0) {
           beginFly({ kind: "src", i }, { kind: "target", i: t }, n);
           dumpBoard();
           return;
         }
+      }
+      if (wouldStealUpwardSlot(color)) {
+        shakeSource(i);
+        dumpBoard();
+        return;
       }
       const destI = findDestFor(color);
       if (destI < 0) {
@@ -4285,8 +4633,9 @@
     }
 
     function onTap(mx, my) {
-      if (levelsMenuOpen()) {
+      if (levelsMenuOpen() || catalogMenuOpen()) {
         setLevelsMenu(false);
+        setCatalogMenu(false);
         return;
       }
       if (state.status !== "play") return;
@@ -4308,7 +4657,12 @@
       }
       if (state.anim) {
         const src = hitSource(mx, my);
-        if (src >= 0) state.queued = src;
+        if (src >= 0 && topRun(state.sources[src])) {
+          const stack = state.sources[src];
+          const color = stack.pieces[stack.pieces.length - 1].color;
+          if (wouldStealUpwardSlot(color)) shakeSource(src);
+          else state.queued = src;
+        }
         return;
       }
       if (carMode()) {
@@ -4981,6 +5335,9 @@
       let spec;
       try { spec = readParams(); }
       catch (e) { return; }
+      spec.slotFill = activeCatalog === 3 ? 3 : 4;
+      const slotEl = document.getElementById("pSlotFill");
+      if (slotEl) slotEl.value = String(spec.slotFill);
       // Hunt nearby seeds with current editor params. If this board already
       // uses the typed seed (or a catalog level is open), start at seed + 1
       // so Generate always rolls a new deal instead of keeping a working one.
@@ -5165,17 +5522,101 @@
         catch (e) { levelIoHint("Select the JSON and copy it manually."); }
       }
     }
+    // Import parser rev 2: clean chat/Slack paste (NBSP etc.) BEFORE JSON.parse.
+    function sanitizeJsonText(text) {
+      let s = String(text == null ? "" : text);
+      // BOM / zero-width / bidi marks — JSON.parse rejects these as tokens.
+      s = s.replace(/[\uFEFF\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u206F\u00AD\u034F\u061C\u180E]/g, "");
+      // Unicode spaces (NBSP U+00A0, thin, ideographic, line/paragraph sep) → regular space.
+      s = s.replace(/[\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]/g, " ");
+      // Any remaining non-newline whitespace (JS \s includes NBSP) → regular space.
+      s = s.replace(/[^\S\r\n\t]/g, " ");
+      s = s.replace(/[\u201C\u201D\u201E\u201F\u2033\u2036\u00AB\u00BB\uFF02]/g, '"');
+      s = s.replace(/[\u2018\u2019\u201A\u201B\u2032\u2035\uFF07]/g, "'");
+      return s.replace(/^\s+|\s+$/g, "");
+    }
+    function stripTrailingCommas(s) {
+      let prev = "";
+      let out = String(s || "");
+      while (out !== prev) {
+        prev = out;
+        out = out.replace(/,(\s*[}\]])/g, "$1");
+      }
+      return out;
+    }
+    function extractBalancedJson(s) {
+      const start = s.search(/[\[{]/);
+      if (start < 0) return "";
+      let depth = 0;
+      let inStr = false;
+      let esc = false;
+      for (let i = start; i < s.length; i++) {
+        const ch = s[i];
+        if (inStr) {
+          if (esc) esc = false;
+          else if (ch === "\\") esc = true;
+          else if (ch === '"') inStr = false;
+          continue;
+        }
+        if (ch === '"') {
+          inStr = true;
+          continue;
+        }
+        if (ch === "{" || ch === "[") depth++;
+        else if (ch === "}" || ch === "]") {
+          depth--;
+          if (depth === 0) return s.slice(start, i + 1);
+        }
+      }
+      return "";
+    }
+    function tryParseJson(s) {
+      if (!s) return { ok: false, reason: "empty" };
+      try { return { ok: true, value: JSON.parse(s) }; }
+      catch (e) {}
+      try { return { ok: true, value: JSON.parse(stripTrailingCommas(s)) }; }
+      catch (e) {}
+      return { ok: false, reason: "parse" };
+    }
+    function extractJsonValue(text) {
+      const s = sanitizeJsonText(text);
+      if (!s) return { ok: false, reason: "empty" };
+      let got = tryParseJson(s);
+      if (got.ok) return got;
+      const slice = extractBalancedJson(s);
+      if (slice && slice !== s) {
+        got = tryParseJson(slice);
+        if (got.ok) return got;
+      } else if (slice) {
+        return { ok: false, reason: "parse" };
+      }
+      return { ok: false, reason: "parse" };
+    }
     function parseImportedLevel(raw) {
       let data = raw;
       if (Array.isArray(data)) data = data[0];
       if (data && Array.isArray(data.levels)) data = data.levels[0];
       if (!data || typeof data !== "object" || !data.spec || !data.deal) return null;
+      if (typeof data.spec !== "object" || typeof data.deal !== "object") return null;
+      const spec = { ...data.spec };
+      if (!Array.isArray(spec.colorCounts) || !spec.colorCounts.length) {
+        // Older exports stored only candles (the old color multiplier).
+        const n = Math.max(2, Math.min(8, +spec.colors || 5));
+        const pack = clampColorPack(spec.candles || COLOR_PACK_DEFAULT);
+        spec.colorCounts = Array.from({ length: n }, () => pack);
+      }
+      syncColorCounts(spec);
       return cloneLevels([{
         id: data.id != null ? String(data.id) : "",
         name: data.name != null ? String(data.name) : "Imported",
-        spec: data.spec,
+        spec: spec,
         deal: data.deal
       }])[0];
+    }
+    function collectImportRows(raw) {
+      if (Array.isArray(raw)) return raw;
+      if (raw && Array.isArray(raw.levels)) return raw.levels;
+      return [raw];
     }
     function uniqueImportName(name, list) {
       const names = new Set((list || []).map((x) => x.name));
@@ -5189,32 +5630,39 @@
     }
     function importPastedLevel() {
       const box = document.getElementById("levelJsonIo");
-      const text = box && box.value.trim();
-      if (!text) {
+      const text = box ? box.value : "";
+      if (!sanitizeJsonText(text)) {
         levelIoHint("Paste a level JSON first.");
         return;
       }
-      let raw;
-      try { raw = JSON.parse(text); }
-      catch (e) {
+      const parsed = extractJsonValue(text);
+      if (!parsed.ok) {
         levelIoHint("Invalid JSON — check the paste and try again.");
         return;
       }
-      const incoming = parseImportedLevel(raw);
-      if (!incoming) {
+      const incoming = collectImportRows(parsed.value).map(parseImportedLevel).filter(Boolean);
+      if (!incoming.length) {
         levelIoHint("That JSON is not a level (need id/name/spec/deal).");
         return;
       }
       const list = loadSaved();
       const ids = new Set(list.map((x) => x.id));
-      if (!incoming.id || ids.has(incoming.id)) incoming.id = "c" + Date.now();
-      incoming.name = uniqueImportName(incoming.name || "Imported", list);
-      list.push(incoming);
+      incoming.forEach((item, idx) => {
+        if (!item.id || ids.has(item.id)) item.id = "c" + Date.now() + "-" + idx;
+        item.name = uniqueImportName(item.name || "Imported", list);
+        const fill = +((item.spec && item.spec.slotFill) || 0);
+        if (fill !== 3 && fill !== 4) item.spec.slotFill = activeCatalog;
+        ids.add(item.id);
+        list.push(item);
+      });
+      const destCatalog = itemCatalog(incoming[0]);
+      if (destCatalog !== activeCatalog) setActiveCatalog(destCatalog);
       writeSaved(list);
       renderCatalog();
-      playCatalogItem(incoming);
+      playCatalogItem(incoming[0]);
       dumpBoard();
-      levelIoHint("Imported “" + incoming.name + "”.", true);
+      const label = incoming.length === 1 ? incoming[0].name : (incoming.length + " levels");
+      levelIoHint("Imported “" + label + "”.", true);
     }
     document.getElementById("exportLevelBtn").onclick = () => exportSelectedLevel();
     document.getElementById("copyLevelBtn").onclick = () => copyLevelJson();
@@ -5274,7 +5722,7 @@
           return;
         }
         spec.colors = spec.colors || 5;
-        spec.candles = spec.candles || 3;
+        syncColorCounts(spec);
         if (state.spec && state.spec.edited) {
           spec.edited = true;
           spec.editedFromSeed = state.spec.editedFromSeed != null ? state.spec.editedFromSeed : state.seed;
@@ -5309,7 +5757,27 @@
         setLevelsMenu(!levelsMenuOpen());
       };
     }
-    ["pColors", "pCandles"].forEach((id) => {
+    const catalogBtn = document.getElementById("catalogBtn");
+    if (catalogBtn) {
+      catalogBtn.onclick = (e) => {
+        e.stopPropagation();
+        setCatalogMenu(!catalogMenuOpen());
+      };
+    }
+    document.querySelectorAll("#catalogSeg button[data-catalog], #playCatalogs button[data-catalog]").forEach((btn) => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        setActiveCatalog(btn.dataset.catalog);
+      };
+    });
+    document.addEventListener("click", (e) => {
+      const tools = document.querySelector(".stage-left-tools");
+      if (tools && tools.contains(e.target)) return;
+      setLevelsMenu(false);
+      setCatalogMenu(false);
+    });
+    syncCatalogChrome();
+    ["pColors"].forEach((id) => {
       const el = document.getElementById(id);
       if (el) el.oninput = onColorParamsInput;
     });
@@ -5378,7 +5846,11 @@
         state.anim.x = along.x;
         state.anim.y = along.y;
         if (state.anim.t >= 1) {
-          try { finishMove(); } catch (err) { state.anim = null; }
+          try { finishMove(); } catch (err) {
+            const a = state.anim;
+            state.anim = null;
+            try { if (a) seatFly(a); } catch (e2) {}
+          }
         }
       }
       if (state.rise) {
