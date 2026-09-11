@@ -473,7 +473,7 @@
     body.play-only .play-col { order: 1; }
   </style>
   <script>
-    /* Play-only: GitHub Pages or ?play=1. Localhost without that flag stays studio. */
+    /* Play-only: GitHub Pages (github.io) or ?play=1 preview. file:// and localhost stay full studio. */
     (function () {
       var host = String(location.hostname || "").toLowerCase();
       var playQ = false;
@@ -727,7 +727,7 @@
     const COLOR_CLEAR_HOLD = 1;
     const CARDYN_CLAIM_HOLD = 0.5;
     const PACK_EAT_STEP = 0.09;
-    const DEST_N = 4;
+    const DEST_N = 3;
     const BOX_GAP = 6;
     const MODE_HINT = {
       free: "Any finished color clears. No delivery order.",
@@ -786,14 +786,15 @@
     }
     const SAVE_KEY = "car-sort-levels-v2";
     const SAVE_META_KEY = "car-sort-levels-v2-meta";
+    const PLAY_PREFS_KEY = "car-sort-play-prefs-v1";
     const CAR_SKIN_KEY = "car-sort-skin-v1";
     const SHIP_URLS = ["http://127.0.0.1:8771/levels.json", "http://10.1.30.15:8771/levels.json"];
     const STUDIO_URL = "http://10.1.30.15:8771/";
     function isFilePage() {
       return location.protocol === "file:";
     }
-    // Play-only: GitHub Pages host, or local preview via ?play=1.
-    // Studio (full editor) is localhost / 127.0.0.1 without that flag.
+    // Play-only: GitHub Pages (hostname contains github.io) or explicit ?play=1 preview.
+    // file:// desktop HTML and localhost / 127.0.0.1 without that flag stay full studio.
     function isPlayOnly() {
       try {
         if (new URLSearchParams(location.search).get("play") === "1") return true;
@@ -808,7 +809,9 @@
     function shipUrls() {
       return isFilePage() ? SHIP_URLS : ["levels.json"];
     }
-    const BUILTIN_LEVELS = [{"id":"c1788812252323","name":"Water Easy 5","spec":{"colors":5,"candles":3,"sources":4,"dests":4,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order","prefill":true,"prefill1":50,"prefill2":35,"prefill3":15,"boardBand":"any","orderBand":"any","seed":1001,"edited":true,"editedFromSeed":1001},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3},"orderQueue":[0,1,2,3,4,3,1,0,0,4,2,1,2,3,4],"edited":true,"editedFromSeed":1001}},{"id":"c1788896488215","name":"Water Easy 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1028,"edited":false,"editedFromSeed":1028},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[0,3,2,1,4,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false}},{"id":"c1788953782749","name":"Water Mid 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"hard","orderBand":"easy","seed":1005,"edited":false,"editedFromSeed":1005},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false}},{"id":"c1788959255343","name":"Water Mid 7 (K\u00f6t\u00fc)","spec":{"colors":7,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"wallCover":0,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1018,"edited":true,"editedFromSeed":1018},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":6,"hidden":false},{"color":2,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3,"6":3},"orderQueue":[0,1,2,3,6,5,6,0,1,2,3,4,5,4,0,1,2,3,4,5,6],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"grid":[],"edited":true,"editedFromSeed":1018}},{"id":"c1788908296338","name":"Water Hard 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":82227,"edited":false,"editedFromSeed":82227},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[3,4,2,0,1,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false}},{"id":"c1788895855388","name":"Impossible 7","spec":{"colors":7,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":2412},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":6,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3,"6":3},"orderQueue":[0,2,1,3,4,5,6,0,1,2,3,4,5,6,0,6,2,3,4,5,1],"givenQueue":[],"givenPlan":[],"givenPlanned":false},"index":8}];
+    // Embedded snapshot of levels.json. Chrome/Safari block fetch of sibling JSON on file://.
+    const EMBEDDED_LEVELS = {"rev":1789117499830,"levels":[{"id":"c1788812252323","name":"Easy 5 (Tight)","spec":{"colors":5,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order","prefill":true,"prefill1":50,"prefill2":35,"prefill3":15,"boardBand":"any","orderBand":"any","seed":1001,"edited":true,"editedFromSeed":1001},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3},"orderQueue":[0,1,2,3,4,3,1,0,0,4,2,1,2,3,4],"edited":true,"editedFromSeed":1001},"index":1},{"id":"c1788896488215","name":"Easy 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1028,"edited":false,"editedFromSeed":1028},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[0,3,2,1,4,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false},"index":2},{"id":"c1789045801023","name":"Easy 6 (2)","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"wallCover":0,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1046,"colorCounts":[3,3,3,3,3,3],"edited":false,"editedFromSeed":1046},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[2,1,0,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"grid":[],"edited":false},"index":3},{"id":"c1788953782749","name":"Mid 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"hard","orderBand":"easy","seed":1005,"edited":false,"editedFromSeed":1005},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false},"index":4},{"id":"c1788908296338","name":"Hard 6","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":82227,"edited":false,"editedFromSeed":82227},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[3,4,2,0,1,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":false},"index":5},{"id":"c1788895855388","name":"Impossible 7","spec":{"colors":7,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1016,"edited":true,"editedFromSeed":1016},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":5,"hidden":false},{"color":6,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":6,"hidden":false},{"color":6,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":6,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":6,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":6,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3,"6":3},"orderQueue":[3,5,2,0,4,1,6,0,1,2,3,4,4,6,0,1,2,3,5,5,6],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"edited":true,"editedFromSeed":1016},"index":6},{"id":"c1789055341897","index":7,"name":"Mid 6 (2)","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"wallCover":0,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1046,"colorCounts":[3,3,3,3,3,3],"edited":false,"editedFromSeed":1046},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[2,1,0,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"grid":[],"edited":false}},{"id":"c1789054492394","index":1,"name":"3 Capacity Test 3 Easy","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":3,"wallCover":0,"hidden":0,"visible":3,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"hard","orderBand":"easy","seed":1058,"colorCounts":[3,3,3,3,3,3],"edited":false,"editedFromSeed":1058},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[3,1,2,0,4,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"grid":[],"edited":false}},{"id":"c1789053986167","index":2,"name":"3 Capacity Test 1 Mid","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":3,"wallCover":0,"hidden":0,"visible":3,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1054,"colorCounts":[3,3,3,3,3,3],"edited":false,"editedFromSeed":1054},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":4,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[3,4,2,0,1,5,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"grid":[],"edited":false}},{"id":"c1789054237379","index":3,"name":"3 Capacity Test 2 Mid","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":3,"wallCover":0,"hidden":0,"visible":3,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"medium","orderBand":"easy","seed":1057,"colorCounts":[3,3,3,3,3,3],"edited":false,"editedFromSeed":1057},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":3,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":5,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[0,5,2,3,4,1,0,1,2,3,4,5,0,1,2,3,4,5],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"grid":[],"edited":false}},{"id":"c1789053614332","index":8,"name":"Car Sort 1","spec":{"colors":6,"candles":3,"sources":4,"dests":3,"targets":2,"slotFill":4,"wallCover":0,"hidden":0,"visible":4,"blocks":false,"manual":true,"mode":"order2","prefill":true,"prefill0":50,"prefill1":17,"prefill2":17,"prefill3":16,"boardBand":"hard","orderBand":"medium","seed":2130,"colorCounts":[3,3,3,3,3,3],"edited":false,"editedFromSeed":2130},"deal":{"dests":[{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]},{"lock":0,"ice":0,"pieces":[]}],"sources":[{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":2,"hidden":false},{"color":2,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":5,"hidden":false},{"color":4,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":0,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":1,"hidden":false}]},{"lock":0,"ice":0,"pieces":[{"color":1,"hidden":false},{"color":3,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false},{"color":1,"hidden":false},{"color":5,"hidden":false},{"color":2,"hidden":false},{"color":1,"hidden":false},{"color":2,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":5,"hidden":false},{"color":0,"hidden":false},{"color":2,"hidden":false},{"color":4,"hidden":false},{"color":0,"hidden":false},{"color":4,"hidden":false},{"color":3,"hidden":false}]}],"goal":{"0":3,"1":3,"2":3,"3":3,"4":3,"5":3},"orderQueue":[0,2,1,3,4,3,0,5,2,5,1,5,0,4,2,3,4,1],"givenQueue":[],"givenPlan":[],"givenPlanned":false,"grid":[],"edited":false}}]};
+    const BUILTIN_LEVELS = EMBEDDED_LEVELS.levels;
     let SHIPPED_LEVELS = BUILTIN_LEVELS;
     const PALETTE = [
       { body: "#E32636", top: "#FF4D5C", side: "#B81C2A", deep: "#8C121C", name: "red" },
@@ -1102,8 +1105,8 @@
     }
     function destCount(spec) {
       if (jamMode(spec)) return 0;
-      const fallback = order2Mode(spec) ? 3 : DEST_N;
-      return Math.max(1, Math.min(6, (spec || state.spec || {}).dests || fallback));
+      // Parking lot count default is DEST_N (3). Not capacity / catalog slotFill.
+      return Math.max(1, Math.min(6, (spec || state.spec || {}).dests || DEST_N));
     }
     function destCap(spec) {
       if (carMode(spec)) return 1;
@@ -2124,7 +2127,7 @@
         candles: lite.candles,
         colorCounts: lite.colorCounts,
         sources: Math.max(2, Math.min(7, +document.getElementById("pSources").value || 4)),
-        dests: Math.max(1, Math.min(6, +document.getElementById("pDests").value || 3)),
+        dests: Math.max(1, Math.min(6, +document.getElementById("pDests").value || DEST_N)),
         targets: Math.max(1, Math.min(6, +document.getElementById("pTargets").value || 2)),
         slotFill: Math.max(1, Math.min(8, +document.getElementById("pSlotFill").value || 4)),
         wallCover: Math.max(0, Math.min(70, +document.getElementById("pWalls").value || 0)),
@@ -2155,7 +2158,7 @@
       syncColorCounts(spec);
       renderColorCounts(spec);
       document.getElementById("pSources").value = spec.sources;
-      document.getElementById("pDests").value = spec.dests == null || spec.dests === 0 ? 3 : spec.dests;
+      document.getElementById("pDests").value = spec.dests == null || spec.dests === 0 ? DEST_N : spec.dests;
       const tgtIn = document.getElementById("pTargets");
       if (tgtIn) tgtIn.value = spec.targets == null ? 2 : spec.targets;
       document.getElementById("pSlotFill").value = spec.slotFill || (jamMode(spec) ? 3 : 4);
@@ -3582,7 +3585,37 @@
       });
       return out;
     }
+    function loadPlayPrefs() {
+      try {
+        const p = JSON.parse(localStorage.getItem(PLAY_PREFS_KEY) || "{}") || {};
+        const cap = +p.catalog === 3 ? 3 : 4;
+        return { rev: +p.rev || 0, lastLevelId: p.lastLevelId || "", catalog: cap };
+      } catch (e) {
+        return { rev: 0, lastLevelId: "", catalog: 4 };
+      }
+    }
+    function savePlayPrefs(partial) {
+      if (!isPlayOnly()) return;
+      try {
+        const prev = loadPlayPrefs();
+        const next = {
+          rev: partial && partial.rev != null ? +partial.rev : prev.rev,
+          lastLevelId: partial && partial.lastLevelId != null ? partial.lastLevelId : prev.lastLevelId,
+          catalog: +((partial && partial.catalog) != null ? partial.catalog : prev.catalog) === 3 ? 3 : 4
+        };
+        localStorage.setItem(PLAY_PREFS_KEY, JSON.stringify(next));
+      } catch (e) {}
+    }
+    function dropPlayCatalogCopy() {
+      // Play must not keep a private catalog fork. Skin + play prefs stay.
+      try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+    }
     function loadSaved() {
+      if (isPlayOnly()) {
+        const shipped = shippedList();
+        const list = cloneLevels(shipped).filter(itemHasDeal);
+        return list.length ? list : cloneLevels(BUILTIN_LEVELS).filter(itemHasDeal);
+      }
       const local = playableLocal();
       const shipped = shippedList();
       // File/shipped catalog wins over hardcoded builtins so git-only levels stay.
@@ -3608,6 +3641,13 @@
       const copy = cloneLevels(incoming);
       applyCatalogIndexes(copy);
       SHIPPED_LEVELS = copy;
+      if (isPlayOnly()) {
+        const prefs = loadPlayPrefs();
+        if (prefs.rev && prefs.rev !== (rev || 0)) dropPlayCatalogCopy();
+        dropPlayCatalogCopy();
+        savePlayPrefs({ rev: rev || 0, lastLevelId: prefs.lastLevelId, catalog: prefs.catalog });
+        return true;
+      }
       localStorage.setItem(SAVE_KEY, JSON.stringify(copy));
       persistMeta({
         order: copy.map((x) => x.id),
@@ -3620,7 +3660,9 @@
       return true;
     }
     // Persist the live catalog to levels.json (git source of truth) via POST.
+    // The studio server also refreshes EMBEDDED_LEVELS from the same payload.
     function shipCatalog(list) {
+      if (isPlayOnly()) return;
       const copy = cloneLevels(list);
       SHIPPED_LEVELS = copy;
       const rev = Date.now();
@@ -3653,6 +3695,7 @@
       });
     }
     function writeSaved(list) {
+      if (isPlayOnly()) return;
       applyCatalogIndexes(list);
       const copy = cloneLevels(list);
       const currentIds = new Set(copy.map((x) => x.id));
@@ -3767,7 +3810,12 @@
       if (slotEl) slotEl.value = String(activeCatalog);
       setCatalogMenu(false);
       syncCatalogChrome();
+      savePlayPrefs({ catalog: activeCatalog });
       renderCatalog();
+      // New catalog: keep the open level only if it belongs here; otherwise funnel index 1.
+      const visible = catalogVisible();
+      const currentOk = activeLevelId && visible.some((x) => x.id === activeLevelId);
+      if (!currentOk && visible[0]) playCatalogItem(visible[0]);
     }
     function playCatalogItem(item) {
       if (!item) return;
@@ -4750,6 +4798,9 @@
 
     function startDeal(spec, deal, levelName, catalogId) {
       activeLevelId = catalogId || null;
+      if (isPlayOnly() && activeLevelId) {
+        savePlayPrefs({ lastLevelId: activeLevelId, catalog: itemCatalog({ spec: spec }) });
+      }
       state.levelName = levelName || "Draft";
       state.spec = spec;
       state.seed = spec.seed;
@@ -5756,7 +5807,7 @@
         const spec = readParams();
         spec.seed = state.seed;
         spec.mode = "order2";
-        spec.dests = Math.max(1, Math.min(6, +document.getElementById("pDests").value || spec.dests || 3));
+        spec.dests = Math.max(1, Math.min(6, +document.getElementById("pDests").value || spec.dests || DEST_N));
         spec.targets = Math.max(1, Math.min(6, +document.getElementById("pTargets").value || spec.targets || 2));
         if (spec.mode === "jam") {
           spec.dests = 0;
@@ -5982,22 +6033,75 @@
     bindColEditor();
     bindCatalogDrag();
     let studioOpen = false;
-    function openStudio() {
-      if (!SHIPPED_LEVELS || !SHIPPED_LEVELS.length) SHIPPED_LEVELS = cloneLevels(BUILTIN_LEVELS);
-      renderCatalog();
-      const list = catalogVisible();
-      const opening = list.find((x) => x.id === "c1788896488215") || list[0];
-      if (opening) {
-        try { playCatalogItem(opening); } catch (e) {}
+    function alignOpeningParkLots(list) {
+      // Easy 5 (Tight) still carried dests:4 from the old DEST_N=4 default.
+      // Studio boot writeParams copies that into #pDests. Play boards use 3 lots.
+      (list || []).forEach((item) => {
+        if (!item || !item.spec || item.id !== "c1788812252323") return;
+        item.spec.dests = DEST_N;
+        const dests = item.deal && item.deal.dests;
+        if (Array.isArray(dests) && dests.length > DEST_N) item.deal.dests = dests.slice(0, DEST_N);
+      });
+      return list;
+    }
+    function seedCatalog() {
+      const embedSrc = (EMBEDDED_LEVELS && EMBEDDED_LEVELS.levels && EMBEDDED_LEVELS.levels.length)
+        ? EMBEDDED_LEVELS.levels
+        : BUILTIN_LEVELS;
+      const embed = cloneLevels(embedSrc);
+      if (isPlayOnly()) {
+        // Same shipped snapshot on every device. Never seed play from localStorage.
+        dropPlayCatalogCopy();
+        SHIPPED_LEVELS = embed.length ? embed : cloneLevels(BUILTIN_LEVELS);
+        return;
       }
+      const local = playableLocal();
+      // Empty [] is truthy — never treat it as a real catalog.
+      SHIPPED_LEVELS = local.length ? cloneLevels(local) : embed;
+      if (!SHIPPED_LEVELS || !SHIPPED_LEVELS.length) SHIPPED_LEVELS = cloneLevels(BUILTIN_LEVELS);
+      alignOpeningParkLots(SHIPPED_LEVELS);
+      if (local.length) {
+        try { localStorage.setItem(SAVE_KEY, JSON.stringify(SHIPPED_LEVELS)); } catch (e) {}
+      }
+    }
+    function applyPlayCatalogTab() {
+      activeCatalog = 4;
+    }
+    function firstCatalogLevel(cap) {
+      activeCatalog = catalogCap(cap == null ? 4 : cap);
+      syncCatalogChrome();
+      const visible = catalogVisible();
+      if (visible.length) return visible[0];
+      const all = loadSaved().filter(itemHasDeal);
+      const wanted = all.filter((item) => itemCatalog(item) === activeCatalog);
+      return wanted[0] || all[0] || null;
+    }
+    function ensureFrameLoop() {
       if (!studioOpen) {
         studioOpen = true;
         requestAnimationFrame(frame);
       }
     }
-    {
-      const local = playableLocal();
-      SHIPPED_LEVELS = local.length ? cloneLevels(local) : cloneLevels(BUILTIN_LEVELS);
+    function playOpeningLevel() {
+      // Fresh load always opens Capacity 4 funnel index 1. Last-played must not override.
+      if (isPlayOnly()) savePlayPrefs({ lastLevelId: "", catalog: 4 });
+      const opening = firstCatalogLevel(4);
+      if (!opening || !itemHasDeal(opening)) return false;
+      try {
+        playCatalogItem(opening);
+        return !!state.deal;
+      } catch (e) {
+        return false;
+      }
+    }
+    function openStudio() {
+      seedCatalog();
+      activeCatalog = 4;
+      if (isPlayOnly()) savePlayPrefs({ catalog: 4, lastLevelId: "" });
+      syncCatalogChrome();
+      renderCatalog();
+      if (!state.deal) playOpeningLevel();
+      ensureFrameLoop();
     }
     function overlayShippedJam(list, file) {
       const deleted = new Set((loadMeta().deleted || []));
@@ -6024,14 +6128,31 @@
     }
     function bootCatalog(data) {
       const parsed = parseCatalogPayload(data);
-      const file = parsed && parsed.levels ? parsed.levels : [];
+      const rawFile = parsed && parsed.levels ? parsed.levels : [];
+      const file = rawFile.filter(itemHasDeal);
+      // Empty [] must not wipe a seeded catalog.
+      if (!file.length) {
+        if (!SHIPPED_LEVELS || !SHIPPED_LEVELS.length) seedCatalog();
+        renderCatalog();
+        if (!state.deal) playOpeningLevel();
+        return;
+      }
+      const fileRev = (parsed && parsed.rev) || 0;
+      if (isPlayOnly()) {
+        applyShipped(file, fileRev);
+        renderCatalog();
+        playOpeningLevel();
+        return;
+      }
       const local = loadLocal();
       const meta = loadMeta();
-      const fileRev = (parsed && parsed.rev) || 0;
       const localRev = +meta.rev || 0;
+      const localPlayable = local.filter(itemHasDeal);
       const fileNewer = file.length && fileRev >= localRev;
-      const isEditor = isFilePage() || meta.source === "editor" || !!meta.dirty;
-      if (fileNewer && !(isEditor && meta.dirty)) {
+      const localNamesNewer = localPlayable.length && localRev > fileRev
+        && catalogHash(localPlayable) !== catalogHash(file);
+      const isEditor = !isPlayOnly() && (isFilePage() || meta.source === "editor" || !!meta.dirty);
+      if (fileNewer && !(isEditor && meta.dirty) && !localNamesNewer) {
         applyShipped(file, fileRev);
       } else if (isEditor && local.length) {
         const merged = overlayShippedJam(preferFileUnedited(mergeCatalog(local, file), file), file);
@@ -6046,76 +6167,83 @@
           source: "editor"
         });
         shipCatalog(merged);
+      } else if (localNamesNewer) {
+        // Keep studio localStorage when it has a newer rev and newer names than embed/file.
+        SHIPPED_LEVELS = cloneLevels(localPlayable);
       } else if (file.length) {
         applyShipped(file, parsed.rev);
       } else if (local.length) {
         SHIPPED_LEVELS = cloneLevels(local);
       }
-      if (!SHIPPED_LEVELS || !SHIPPED_LEVELS.length) SHIPPED_LEVELS = cloneLevels(BUILTIN_LEVELS);
+      if (!SHIPPED_LEVELS || !SHIPPED_LEVELS.length) seedCatalog();
+      if (!isPlayOnly()) alignOpeningParkLots(SHIPPED_LEVELS);
+      renderCatalog();
+      if (!state.deal) playOpeningLevel();
+    }
+    function shipFilePageIfNeeded() {
+      if (isPlayOnly() || !isFilePage() || !loadLocal().length) return;
+      const merged = loadSaved();
+      const frameEl = document.createElement("iframe");
+      frameEl.name = "candleShip";
+      frameEl.setAttribute("aria-hidden", "true");
+      frameEl.style.display = "none";
+      document.body.appendChild(frameEl);
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = SHIP_URLS[0];
+      form.target = "candleShip";
+      form.acceptCharset = "UTF-8";
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "levels";
+      input.value = JSON.stringify(merged);
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
     }
     function startStudio() {
-      if (studioOpen) {
-        renderCatalog();
-        if (!state.deal) openStudio();
-        return;
-      }
-      if (isFilePage() && loadLocal().length) {
-        const merged = loadSaved();
-        const frame = document.createElement("iframe");
-        frame.name = "candleShip";
-        frame.setAttribute("aria-hidden", "true");
-        frame.style.display = "none";
-        document.body.appendChild(frame);
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = SHIP_URLS[0];
-        form.target = "candleShip";
-        form.acceptCharset = "UTF-8";
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "levels";
-        input.value = JSON.stringify(merged);
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
-        const want = catalogHash(merged);
-        let n = 0;
-        const tick = function () {
-          fetch(SHIP_URLS[0] + "?t=" + Date.now(), { cache: "no-store", mode: "cors" })
-            .then((r) => (r.ok ? r.json() : null))
-            .then((data) => {
-              const parsed = parseCatalogPayload(data);
-              if (parsed && catalogHash(parsed.levels) === want) {
-                location.replace(STUDIO_URL);
-                return;
-              }
-              n += 1;
-              if (n < 25) setTimeout(tick, 200);
-              else openStudio();
-            })
-            .catch(function () {
-              n += 1;
-              if (n < 25) setTimeout(tick, 200);
-              else openStudio();
-            });
-        };
-        setTimeout(tick, 150);
-        return;
-      }
       openStudio();
+      shipFilePageIfNeeded();
     }
-    const catalogGet = isFilePage()
-      ? fetch(SHIP_URLS[0] + "?t=" + Date.now(), { cache: "no-store", mode: "cors" }).catch(function () {
-          return fetch(SHIP_URLS[1] + "?t=" + Date.now(), { cache: "no-store", mode: "cors" });
+    function embeddedCatalog() {
+      const levels = (EMBEDDED_LEVELS && EMBEDDED_LEVELS.levels) || BUILTIN_LEVELS;
+      return {
+        rev: (EMBEDDED_LEVELS && +EMBEDDED_LEVELS.rev) || 0,
+        levels: cloneLevels(levels)
+      };
+    }
+    function loadShippedCatalog() {
+      // file:// cannot fetch sibling JSON. HTTP/HTTPS prefers live levels.json; embed is fallback.
+      // Play (github.io) always uses this fetch — never a per-device localStorage catalog.
+      if (isFilePage()) return Promise.resolve(embeddedCatalog());
+      const url = "levels.json?v=" + Date.now();
+      return fetch(url, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-store", Pragma: "no-cache" }
+      })
+        .then((r) => {
+          if (!r || !r.ok) throw new Error("catalog");
+          return r.json();
         })
-      : fetch("levels.json?t=" + Date.now(), { cache: "no-store" });
-    catalogGet
-      .then((r) => (r && r.ok ? r.json() : null))
+        .then((data) => {
+          const parsed = parseCatalogPayload(data);
+          if (!parsed || !parsed.levels.length) throw new Error("catalog");
+          return data;
+        })
+        .catch(function () {
+          return embeddedCatalog();
+        });
+    }
+    // Seed + play immediately. Do not wait for fetch or Generate.
+    seedCatalog();
+    openStudio();
+    loadShippedCatalog()
       .then(bootCatalog)
-      .catch(function () {})
+      .catch(function () { bootCatalog(embeddedCatalog()); })
       .then(startStudio);
     window.addEventListener("pagehide", () => {
       try {
+        if (isPlayOnly()) return;
         const meta = loadMeta();
         if (!meta.dirty || meta.source !== "editor") return;
         const list = loadLocal();
