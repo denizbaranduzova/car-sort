@@ -556,7 +556,7 @@
           </div>
           <div class="overlay" id="overlay" hidden>
             <div class="card">
-              <h2 id="ovTitle">Sorted</h2>
+              <h2 id="ovTitle">Win</h2>
               <p id="ovText">Every truck is loaded.</p>
               <div class="overlay-buttons">
                 <button class="btn-primary" id="ovPrimary">Next level</button>
@@ -3943,7 +3943,7 @@
     function showWinOverlay() {
       overlayKind = "win";
       const next = nextCatalogItem();
-      setOverlay(true, "Sorted", "Every truck is loaded.", {
+      setOverlay(true, "Win", "Every truck is loaded.", {
         secondary: "Play again",
         primary: next ? "Next level" : "Next level",
         hidePrimary: !next
