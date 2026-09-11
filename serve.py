@@ -7,11 +7,30 @@ import time
 
 ROOT = Path(__file__).resolve().parent
 LEVELS = ROOT / "levels.json"
+INDEX = ROOT / "index.html"
 PORT = 8771
 
 
 def jam_level_colors(item):
     return int(((item or {}).get("spec") or {}).get("colors") or 0)
+
+
+def sync_embedded_levels(payload):
+    """Keep EMBEDDED_LEVELS identical to disk so file:// cannot be older than levels.json."""
+    if not INDEX.exists():
+        return
+    text = INDEX.read_text(encoding="utf-8")
+    needle = "const EMBEDDED_LEVELS = "
+    start = text.find(needle)
+    if start < 0:
+        return
+    json_start = start + len(needle)
+    try:
+        _, end_rel = json.JSONDecoder().raw_decode(text[json_start:])
+    except json.JSONDecodeError:
+        return
+    blob = json.dumps(payload, separators=(",", ":"))
+    INDEX.write_text(text[:json_start] + blob + text[json_start + end_rel :], encoding="utf-8")
 
 
 def write_catalog(data):
@@ -45,6 +64,10 @@ def write_catalog(data):
             pass
     payload = {"rev": int(time.time() * 1000), "levels": levels}
     LEVELS.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    try:
+        sync_embedded_levels(payload)
+    except Exception:
+        pass
 
 
 class Handler(SimpleHTTPRequestHandler):
