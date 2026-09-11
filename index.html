@@ -47,16 +47,21 @@
     .design-io .io-json { min-height: 72px; }
     .play-screen { display: flex; flex-direction: column; gap: 8px; }
 
-    .header { width: 100%; text-align: center; position: relative; }
+    .header {
+      width: 100%; text-align: center; position: relative; z-index: 1;
+    }
     .header h1 { font-size: 1.05rem; font-weight: 800; letter-spacing: 0.08em; }
+    .stage-wrap { position: relative; width: 100%; }
     .play-levels {
-      position: absolute; top: 50px; left: 10px; right: 10px;
+      position: absolute; top: calc(100% + 6px); left: 0;
+      min-width: min(280px, calc(100vw - 24px));
+      max-width: min(360px, calc(100vw - 24px));
       display: flex; flex-wrap: wrap; gap: 6px;
       padding: 10px;
       background: rgba(255,252,248,0.96);
       border-radius: 14px;
       box-shadow: 0 8px 24px rgba(40, 28, 16, 0.18);
-      z-index: 3;
+      z-index: 7;
     }
     .play-levels[hidden] { display: none; }
     .play-levels button {
@@ -67,26 +72,26 @@
     }
     .play-levels button.is-active { background: #f67c5f; color: #fff; }
     .stage-levels-btn, .restart-btn {
-      position: absolute; top: 10px; z-index: 3;
       border: none; cursor: pointer;
       background: rgba(255,252,248,0.86);
       box-shadow: 0 2px 8px rgba(40, 28, 16, 0.12);
       color: var(--ink);
       -webkit-tap-highlight-color: transparent;
     }
+    /* Catalog above Levels — left cluster on the stage top band, aligned with Restart. */
     .stage-left-tools {
       position: absolute; top: 10px; left: 10px; z-index: 5;
-      display: flex; align-items: flex-start; gap: 6px;
+      display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;
+      gap: 5px;
     }
     .stage-left-tools .stage-levels-btn {
       position: relative; top: auto; left: auto;
     }
-    .stage-catalog { position: relative; }
+    .stage-catalog, .stage-levels { position: relative; }
     .stage-levels-btn {
-      left: 10px;
       border-radius: 999px;
-      padding: 7px 12px;
-      font: inherit; font-size: 0.68rem; font-weight: 800;
+      padding: 6px 10px;
+      font: inherit; font-size: 0.62rem; font-weight: 800;
       letter-spacing: 0.04em; text-transform: uppercase;
     }
     .stage-levels-btn[hidden] { display: none; }
@@ -137,7 +142,7 @@
       cursor: pointer; flex: 0 0 auto;
     }
     .restart-btn {
-      right: 10px;
+      position: absolute; top: 10px; right: 10px; z-index: 3;
       width: 36px; height: 36px; padding: 0;
       border-radius: 50%;
       font-size: 1.15rem; opacity: 0.85;
@@ -450,11 +455,43 @@
       .design-col .design-io { flex: 0 0 auto; margin-top: 14px; }
       .stage { height: min(82dvh, 760px); }
     }
+
+    /* Public play URL: gameplay only. Editor markup stays in the DOM. */
+    html.play-only .studio-only,
+    body.play-only .studio-only { display: none !important; }
+    html.play-only .studio,
+    body.play-only .studio {
+      max-width: 402px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      grid-template-columns: none;
+      grid-template-areas: none;
+      padding: calc(8px + env(safe-area-inset-top)) 8px calc(16px + env(safe-area-inset-bottom));
+    }
+    html.play-only .play-col,
+    body.play-only .play-col { order: 1; }
   </style>
+  <script>
+    /* Play-only: GitHub Pages or ?play=1. Localhost without that flag stays studio. */
+    (function () {
+      var host = String(location.hostname || "").toLowerCase();
+      var playQ = false;
+      try { playQ = new URLSearchParams(location.search).get("play") === "1"; } catch (e) {}
+      if (playQ || host.indexOf("github.io") !== -1) {
+        document.documentElement.classList.add("play-only");
+      }
+    })();
+  </script>
 </head>
 <body>
+  <script>
+    if (document.documentElement.classList.contains("play-only")) {
+      document.body.classList.add("play-only");
+    }
+  </script>
   <div class="studio">
-    <div class="data-col">
+    <div class="data-col studio-only">
       <div class="panel">
         <div class="panel-head">
           <h2>Level data</h2>
@@ -477,8 +514,7 @@
         <div class="header">
           <h1>Car Sort</h1>
         </div>
-        <div class="stage">
-          <canvas id="game"></canvas>
+        <div class="stage-wrap">
           <div class="stage-left-tools">
             <div class="stage-catalog">
               <button type="button" class="stage-levels-btn" id="catalogBtn" aria-expanded="false" aria-controls="playCatalogs">Catalog</button>
@@ -487,10 +523,14 @@
                 <button type="button" data-catalog="3">Capacity 3</button>
               </div>
             </div>
-            <button type="button" class="stage-levels-btn" id="levelsBtn" aria-expanded="false" aria-controls="playLevels">Levels</button>
+            <div class="stage-levels">
+              <button type="button" class="stage-levels-btn" id="levelsBtn" aria-expanded="false" aria-controls="playLevels">Levels</button>
+              <div class="play-levels" id="playLevels" hidden></div>
+            </div>
           </div>
+          <div class="stage">
+          <canvas id="game"></canvas>
           <button class="restart-btn" id="restart" title="Restart level" aria-label="Restart level">↻</button>
-          <div class="play-levels" id="playLevels" hidden></div>
           <div class="hud">
             <div class="goal-card" id="goalCard"></div>
             <div class="level-pill" id="levelPill">Draft</div>
@@ -505,12 +545,13 @@
               </div>
             </div>
           </div>
+          </div>
         </div>
         <div class="dock">
           <button type="button" id="undoBtn">Undo</button>
         </div>
-        <p class="hint" id="hint">Tap a queue-top car to load it onto a truck. Other colors still use the parking lots.</p>
-        <label class="block-toggle play-block-toggle">
+        <p class="hint studio-only" id="hint">Tap a queue-top car to load it onto a truck. Other colors still use the parking lots.</p>
+        <label class="block-toggle play-block-toggle studio-only">
           <span class="block-toggle-copy">
             <strong>Car Skin</strong>
             <em>On: car sprites, compact trucks, 2×2 parking lots. Off: classic boxes.</em>
@@ -521,7 +562,7 @@
             <b id="pCarSkinLabel">Off</b>
           </span>
         </label>
-        <label class="block-toggle play-block-toggle">
+        <label class="block-toggle play-block-toggle studio-only">
           <span class="block-toggle-copy">
             <strong>Block refill</strong>
             <em>On: finish a visible set, then the next set rises. Off: pieces rise one by one.</em>
@@ -535,7 +576,7 @@
       </div>
     </div>
 
-    <div class="design-col">
+    <div class="design-col studio-only">
       <div class="panel catalog-pick-panel">
         <div class="game-switch catalog-switch" id="catalogSeg" role="tablist" aria-label="Catalog">
           <button type="button" data-catalog="4" class="active" role="tab">Capacity 4</button>
@@ -750,6 +791,19 @@
     const STUDIO_URL = "http://10.1.30.15:8771/";
     function isFilePage() {
       return location.protocol === "file:";
+    }
+    // Play-only: GitHub Pages host, or local preview via ?play=1.
+    // Studio (full editor) is localhost / 127.0.0.1 without that flag.
+    function isPlayOnly() {
+      try {
+        if (new URLSearchParams(location.search).get("play") === "1") return true;
+      } catch (e) {}
+      const host = String(location.hostname || "").toLowerCase();
+      return host.indexOf("github.io") !== -1;
+    }
+    if (isPlayOnly()) {
+      document.documentElement.classList.add("play-only");
+      document.body.classList.add("play-only");
     }
     function shipUrls() {
       return isFilePage() ? SHIP_URLS : ["levels.json"];
@@ -2325,7 +2379,8 @@
         let lotH = grid.rows * cell + (grid.rows - 1) * cellGap;
         let destTop = destY - lotH;
         hudY = destTop - 18 - chipH;
-        const topAir = 52;
+        // Catalog/Levels sit below the title, not on the truck row.
+        const topAir = 16;
         if (hudY < topAir) {
           hudY = topAir;
           destTop = hudY + chipH + 18;
